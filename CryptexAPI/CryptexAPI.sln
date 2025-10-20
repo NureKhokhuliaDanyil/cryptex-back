@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptexAPI", "CryptexAPI\CryptexAPI.csproj", "{94F7F499-AC35-4A29-A19E-5444190FE748}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{94F7F499-AC35-4A29-A19E-5444190FE748}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94F7F499-AC35-4A29-A19E-5444190FE748}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94F7F499-AC35-4A29-A19E-5444190FE748}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94F7F499-AC35-4A29-A19E-5444190FE748}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DFDED40C-FDFC-4582-8B8D-22CD1E4CA248}
+	EndGlobalSection
+EndGlobal
