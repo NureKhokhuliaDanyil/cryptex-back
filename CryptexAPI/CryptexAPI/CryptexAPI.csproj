@@ -28,7 +28,6 @@
     <Folder Include="Controllers\" />
     <Folder Include="Identity\" />
     <Folder Include="Strings\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
 </Project>
