@@ -26,14 +26,10 @@
   <ItemGroup>
     <Folder Include="BackGroundJob\" />
     <Folder Include="Controllers\" />
-    <Folder Include="Exceptions\" />
-    <Folder Include="Helpers\" />
     <Folder Include="Identity\" />
-    <Folder Include="Messages\" />
     <Folder Include="UnitOfWork\" />
     <Folder Include="Strings\" />
     <Folder Include="Services\" />
-    <Folder Include="Repos\" />
   </ItemGroup>
 
 </Project>
