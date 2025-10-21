@@ -1,4 +1,10 @@
 
+using CryptexAPI.Context;
+using CryptexAPI.Repos;
+using CryptexAPI.Repos.Interfaces;
+using CryptexAPI.UnitOfWork;
+using Microsoft.EntityFrameworkCore;
+
 namespace CryptexAPI
 {
     public class Program
@@ -12,6 +18,15 @@ namespace CryptexAPI
             builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
+
+            builder.Services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(builder.Configuration.GetConnectionString("CryptexDB")));
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
+            builder.Services.AddScoped<ICoinRepository, CoinRepository>();
+            builder.Services.AddScoped<ISeedPhraseRepository, SeedPhraseRepository>();
+            builder.Services.AddScoped<IUserRepository, UserRepository>();
+            builder.Services.AddScoped<IWalletForMarketRepository, WalletForMarketRepository>();
+            builder.Services.AddScoped<IWalletRepository, WalletRepository>();
 
             var app = builder.Build();
 
