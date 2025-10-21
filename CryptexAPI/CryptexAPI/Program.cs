@@ -51,8 +51,6 @@ namespace CryptexAPI
             SD.JWTKey = builder.Configuration["Jwt:Key"];
             SD.Audience = builder.Configuration["Audience"];
             // Add services to the container.
-
-            builder.Services.AddControllers();
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
@@ -71,6 +69,8 @@ namespace CryptexAPI
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITokenGeneratingService, TokenGeneratingService>();
             builder.Services.AddScoped<IBinanceRequestService, BinanceRequestService>();
+
+            builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -106,9 +106,14 @@ namespace CryptexAPI
             if (app.Environment.IsDevelopment())
             {
                 app.MapOpenApi();
-                app.UseSwagger();
-                app.UseSwaggerUI();
             }
+
+            app.UseSwagger();
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cryptex API v1");
+                c.RoutePrefix = "swagger"; // default; set to string.Empty to serve at root
+            });
 
             app.UseHttpsRedirection();
 
