@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <Folder Include="BackGroundJob\" />
-    <Folder Include="Controllers\" />
     <Folder Include="Identity\" />
     <Folder Include="Strings\" />
   </ItemGroup>
