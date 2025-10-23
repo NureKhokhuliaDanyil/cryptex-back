@@ -50,6 +50,7 @@ public class WalletService : IWalletService
     {
         try
         {
+            await _seedPhraseService.AddBaseWords();
             var seedPhraseBase = await _seedPhraseService.GetSeedPhraseBase();
             var random = new Random();
             var seedPhrase = new SeedPhrase

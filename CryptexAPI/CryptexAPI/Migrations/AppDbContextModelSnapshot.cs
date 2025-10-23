@@ -95,7 +95,7 @@ namespace CryptexAPI.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CryptexAPI.Models.Wallets.Coin", b =>
@@ -127,7 +127,7 @@ namespace CryptexAPI.Migrations
 
                     b.HasIndex("WalletId");
 
-                    b.ToTable("Coins");
+                    b.ToTable("Coins", (string)null);
                 });
 
             modelBuilder.Entity("CryptexAPI.Models.Wallets.SeedPhrase", b =>
@@ -144,7 +144,7 @@ namespace CryptexAPI.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SeedPhrases");
+                    b.ToTable("SeedPhrases", (string)null);
                 });
 
             modelBuilder.Entity("CryptexAPI.Models.Wallets.Wallet", b =>
@@ -165,7 +165,7 @@ namespace CryptexAPI.Migrations
 
                     b.HasIndex("SeedPhraseId");
 
-                    b.ToTable("Wallets");
+                    b.ToTable("Wallets", (string)null);
                 });
 
             modelBuilder.Entity("CryptexAPI.Models.Wallets.WalletForMarket", b =>
@@ -186,7 +186,7 @@ namespace CryptexAPI.Migrations
 
                     b.HasIndex("SeedPhraseId");
 
-                    b.ToTable("WalletForMarkets");
+                    b.ToTable("WalletForMarkets", (string)null);
                 });
 
             modelBuilder.Entity("CryptexAPI.Models.Persons.User", b =>

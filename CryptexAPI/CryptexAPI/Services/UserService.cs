@@ -43,7 +43,7 @@ public class UserService : IUserService
         bool IsGoogleRegistration = false
         )
     {
-        if (registrationModel != null)
+        if (registrationModel != null)  
         {
             var parsedRole = Enum.Parse<Role>(registrationModel.Role);
             var baseUser = new User()
