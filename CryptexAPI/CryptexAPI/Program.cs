@@ -55,7 +55,7 @@ namespace CryptexAPI
             builder.Services.AddOpenApi();
 
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("CryptexDB")));
+                options.UseNpgsql(builder.Configuration.GetConnectionString("CryptexDB")));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
             builder.Services.AddScoped<ICoinRepository, CoinRepository>();
             builder.Services.AddScoped<ISeedPhraseRepository, SeedPhraseRepository>();
