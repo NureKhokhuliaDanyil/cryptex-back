@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace CryptexAPI
 {
@@ -72,6 +73,12 @@ namespace CryptexAPI
             builder.Services.AddScoped<ITokenGeneratingService, TokenGeneratingService>();
             builder.Services.AddScoped<IBinanceRequestService, BinanceRequestService>();
 
+            builder.Services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
+
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
@@ -103,6 +110,8 @@ namespace CryptexAPI
                 });
             });
             var app = builder.Build();
+
+            app.UseForwardedHeaders();
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
