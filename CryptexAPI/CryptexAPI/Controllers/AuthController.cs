@@ -60,7 +60,7 @@ public class AuthController : ControllerBase
                 Adress = claims.FirstOrDefault(x => x.Type == ClaimTypes.StreetAddress)?.Value ?? "",
                 Role = claims.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value ?? ""
             };
-            var wallet = await _walletService.CreateWallet();
+            var wallet = _walletService.CreateWallet();
             user = await _userService.Insert(registrationModel, wallet, isGoogleRegistration: true);
         }
 
@@ -85,7 +85,7 @@ public class AuthController : ControllerBase
     [HttpPost("registration")]
     public async Task<ActionResult> Registration(RegistrationModel registrationModel)
     {
-        var wallet = await _walletService.CreateWallet();
+        var wallet = _walletService.CreateWallet();
         var result = await _userService.Insert(registrationModel, wallet);
         if (result != null)
         {

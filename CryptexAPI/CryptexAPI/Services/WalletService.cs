@@ -9,25 +9,19 @@ namespace CryptexAPI.Services;
 public class WalletService : IWalletService
 {
     private readonly IUnitOfWork _unitOfWork;
-    private readonly ISeedPhraseService _seedPhraseService;
-    private readonly IBinanceRequestService _binanceRequestService;
-    public WalletService(IUnitOfWork unitOfWork, ISeedPhraseService seedPhraseService, IBinanceRequestService binanceRequestService)
+
+    public WalletService(IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
-        _seedPhraseService = seedPhraseService;
-        _binanceRequestService = binanceRequestService;
     }
-    public async Task<Wallet> CreateWallet()
+
+    public Wallet CreateWallet()
     {
         try
         {
             var wallet = new Wallet();
-            wallet.AmountOfCoins = await CreateListOfCoins(wallet.Id);
-            wallet.SeedPhraseSet(await CreateSeedPhrase());
-            if (wallet == null)
-            {
-                throw new Exception("Failed to create wallet");
-            }
+            wallet.AmountOfCoins = CreateListOfCoins(wallet.Id);
+            wallet.SeedPhraseSet(CreateSeedPhrase());
 
             return wallet;
         }
@@ -36,31 +30,49 @@ public class WalletService : IWalletService
             throw new Exception($"Failed to create wallet {ex.Message}");
         }
     }
-    private async Task<List<Coin>> CreateListOfCoins(int walletId)
+
+    private List<Coin> CreateListOfCoins(int walletId)
     {
         var coinList = new List<Coin>();
         foreach (NameOfCoin name in Enum.GetValues(typeof(NameOfCoin)))
         {
-            var coin = new Coin() { Amount = 0, Name = name, Price = await _binanceRequestService.GetCoinPriceFromBinance(name), WalletId = walletId };
+            var coin = new Coin()
+            {
+                Amount = 0,
+                Name = name,
+                Price = 0,
+                WalletId = walletId
+            };
             coinList.Add(coin);
         }
         return coinList;
     }
-    private async Task<SeedPhrase> CreateSeedPhrase()
+
+    private SeedPhrase CreateSeedPhrase()
     {
         try
         {
-            await _seedPhraseService.AddBaseWords();
-            var seedPhraseBase = await _seedPhraseService.GetSeedPhraseBase();
+            var words = new List<string>
+            {
+                "umbrella", "window", "elephant", "chair", "spaghetti", "notebook", "clover", "ocean",
+                "aardvark", "chocolate", "eyebrow", "pigeon", "cup", "rose", "dragon", "cell", "fork",
+                "bicycle", "lipstick", "corn", "cow", "flamingo", "ghost", "muffin", "paw", "windmill",
+                "potato", "rainbow", "swamp", "whisk", "gnome", "spaceship", "wallet", "dinosaur",
+                "elbow", "fiddle", "gorilla", "harp", "igloo", "jackal", "kiwi", "llama", "mango",
+                "nugget", "octopus", "peanut", "quokka", "raccoon", "snail", "taco", "unicorn",
+                "vampire", "wombat", "xylophone", "yak", "zebra", "atom", "banjo", "cactus", "dolphin",
+                "echo", "flannel", "goblin", "hamburger", "iceberg", "jigsaw", "kaleidoscope", "lemon"
+            };
+
             var random = new Random();
             var seedPhrase = new SeedPhrase
             {
-                SeedPhraseValues = []
+                SeedPhraseValues = new List<string>()
             };
 
             for (var i = 0; i < GlobalConsts.SeedPhraseLength; i++)
             {
-                var randomWord = seedPhraseBase.SeedPhraseValues[random.Next(seedPhraseBase.SeedPhraseValues.Count)];
+                var randomWord = words[random.Next(words.Count)];
                 seedPhrase.SeedPhraseValues.Add(randomWord);
             }
             return seedPhrase;

@@ -4,7 +4,7 @@ namespace CryptexAPI.Services.Interfaces;
 
 public interface IWalletService
 {
-    Task<Wallet> CreateWallet();
+    Wallet CreateWallet();
     Task<Wallet> GetWallet(int walletId);
     Task UpdateCoin(Coin coin);
 }
