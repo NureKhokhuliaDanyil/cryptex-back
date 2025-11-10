@@ -10,3 +10,5 @@
 
 Dockerfile
 .dockerignore
+
+**/Properties/launchSettings.json
