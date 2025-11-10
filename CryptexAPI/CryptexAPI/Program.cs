@@ -54,8 +54,10 @@ namespace CryptexAPI
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+            var connectionString = "postgresql://cryptex_user:6XwTTpNo3eEd9HAvHUL7zPV3G466hRB6@dpg-d48rs4mmcj7s73e53fng-a/cryptex";
+
             builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(builder.Configuration.GetConnectionString("ConnectionStrings__CryptexDB")));
+                options.UseNpgsql(connectionString));
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork.UnitOfWork>();
             builder.Services.AddScoped<ICoinRepository, CoinRepository>();
             builder.Services.AddScoped<ISeedPhraseRepository, SeedPhraseRepository>();
