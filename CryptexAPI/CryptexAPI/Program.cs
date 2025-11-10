@@ -26,7 +26,11 @@ namespace CryptexAPI
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = GoogleDefaults.AuthenticationScheme;
             })
-               .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+               .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+               {
+                   options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
+                   options.Cookie.SameSite = SameSiteMode.Lax;
+               })
                .AddJwtBearer(options =>
                {
                    options.TokenValidationParameters = new TokenValidationParameters
@@ -46,6 +50,7 @@ namespace CryptexAPI
                    options.ClientSecret = builder.Configuration["Google:ClientSecret"];
                    options.CallbackPath = "/signin-google";
                    options.SaveTokens = true;
+                   options.CorrelationCookie.SameSite = SameSiteMode.Lax;
                });
 
             SD.Issuer = builder.Configuration["Jwt:Issuer"];
