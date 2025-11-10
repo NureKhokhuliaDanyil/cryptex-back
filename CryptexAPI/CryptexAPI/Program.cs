@@ -126,8 +126,6 @@ namespace CryptexAPI
                 c.RoutePrefix = "swagger"; // default; set to string.Empty to serve at root
             });
 
-            app.UseHttpsRedirection();
-
             app.UseAuthentication();
             app.UseAuthorization();
 
