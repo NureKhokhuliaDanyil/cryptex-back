@@ -78,6 +78,19 @@ namespace CryptexAPI
             builder.Services.AddScoped<ITokenGeneratingService, TokenGeneratingService>();
             builder.Services.AddScoped<IBinanceRequestService, BinanceRequestService>();
 
+            var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy(name: myAllowSpecificOrigins,
+                                  policy =>
+                                  {
+                                      policy.AllowAnyOrigin()
+                                            .AllowAnyHeader()
+                                            .AllowAnyMethod();
+                                  });
+            });
+
             builder.Services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders =
@@ -117,6 +130,7 @@ namespace CryptexAPI
             var app = builder.Build();
 
             app.UseForwardedHeaders();
+            app.UseCors(myAllowSpecificOrigins);
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
