@@ -10,5 +10,6 @@ public interface IUnitOfWork
     IWalletForMarketRepository WalletForMarketRepository { get; }
     IWalletRepository WalletRepository { get; }
     IFuethersDealRepository FuethersDealRepository { get; }
+    ITransactionHistoryRepository TransactionHistoryRepository { get; }
     Task SaveChangesAsync();
 }
