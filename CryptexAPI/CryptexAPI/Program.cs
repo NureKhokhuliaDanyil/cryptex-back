@@ -77,7 +77,9 @@ namespace CryptexAPI
             builder.Services.AddScoped<IUserService, UserService>();
             builder.Services.AddScoped<ITokenGeneratingService, TokenGeneratingService>();
             builder.Services.AddScoped<IBinanceRequestService, BinanceRequestService>();
-
+            builder.Services.AddScoped<IFuethersDealService, FuethersDealService>();
+            builder.Services.AddScoped<IFuethersDealRepository, FuethersDealRepository>();
+            
             var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
             builder.Services.AddCors(options =>

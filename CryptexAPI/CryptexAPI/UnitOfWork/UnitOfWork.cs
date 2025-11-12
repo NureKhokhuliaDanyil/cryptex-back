@@ -12,12 +12,15 @@ public class UnitOfWork : IUnitOfWork, IDisposable
     public IUserRepository UserRepository { get; private set; }
     public IWalletForMarketRepository WalletForMarketRepository { get; private set; }
     public IWalletRepository WalletRepository { get; private set; }
+    public IFuethersDealRepository FuethersDealRepository { get; private set; }
+
     public UnitOfWork(AppDbContext dbContext,
         ICoinRepository coinRepository,
         ISeedPhraseRepository seedPhraseRepository,
         IUserRepository userRepository,
         IWalletForMarketRepository walletForMarketRepository,
-        IWalletRepository walletRepository)
+        IWalletRepository walletRepository,
+        IFuethersDealRepository fuethersDealRepository)
     {
         _dbContext = dbContext;
         CoinRepository = coinRepository;
@@ -25,6 +28,7 @@ public class UnitOfWork : IUnitOfWork, IDisposable
         UserRepository = userRepository;
         WalletForMarketRepository = walletForMarketRepository;
         WalletRepository = walletRepository;
+        FuethersDealRepository = fuethersDealRepository;
     }
 
     public async Task SaveChangesAsync()
