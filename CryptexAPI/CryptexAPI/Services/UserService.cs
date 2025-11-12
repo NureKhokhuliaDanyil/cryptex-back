@@ -5,8 +5,6 @@ using CryptexAPI.Models.Persons;
 using CryptexAPI.Models.Wallets;
 using CryptexAPI.Services.Interfaces;
 using CryptexAPI.UnitOfWork;
-using Microsoft.AspNetCore.Identity;
-using System.Net.Sockets;
 
 namespace CryptexAPI.Services;
 
@@ -289,5 +287,29 @@ public class UserService : IUserService
         await _unitOfWork.SaveChangesAsync();
 
         return user;
+    }
+
+    public async Task WithdrawFundsAsync(int userId, double amount)
+    {
+        var result = await _unitOfWork.UserRepository
+                 .GetSingleByConditionAsync(e => e.Id == userId);
+        if (!result.IsSuccess)
+        {
+            throw new Exception($"Failed to get wallet");
+        }
+
+        var user = result.Data;
+
+        if (user.Balance < amount)
+        {
+            throw new Exception("Insufficient balance to withdraw funds.");
+        } else
+        {
+            user.Balance -= amount;
+            await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == userId);
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        return;
     }
 }
