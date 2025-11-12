@@ -2,7 +2,7 @@ name: Update Coin Prices
 
 on:
   schedule:
-    - cron: '*/1 * * * *'
+    - cron: '*/45 * * * *'
   workflow_dispatch:
 
 jobs:
