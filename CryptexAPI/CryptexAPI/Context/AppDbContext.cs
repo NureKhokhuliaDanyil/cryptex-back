@@ -13,4 +13,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<WalletForMarket> WalletForMarkets { get; set; }
     public DbSet<FuethersDeal> FuethersDeals { get; set; }
+    public DbSet<TransactionHistory> TransactionHistories { get; set; }
 }

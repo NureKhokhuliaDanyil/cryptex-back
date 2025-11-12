@@ -122,13 +122,41 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPatch("{userId}/deposit")]
+    public async Task<IActionResult> DepositFunds(int userId, [FromQuery] double amount)
+    {
+        try
+        {
+            var user = await _userService.DepositFundsAsync(userId, amount);
+            return Ok(user);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = $"Error: {e.Message}" });
+        }
+    }
+
     [HttpPost("{id}/withdraw")]
-    public async Task<IActionResult> WithdawFunds(int id, [FromQuery] double amount)
+    public async Task<IActionResult> WithdrawFunds(int id, [FromQuery] double amount)
     {
         try
         {
             await _userService.WithdrawFundsAsync(id, amount);
-            return Ok("Funds were withdrawed successfully");
+            return Ok("Funds were withdrawn successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
+
+    [HttpGet("{id}/history")]
+    public async Task<IActionResult> GetTransactionHistory(int id)
+    {
+        try
+        {
+            var history = await _userService.GetTransactionHistoryAsync(id);
+            return Ok(history);
         }
         catch (Exception ex)
         {
