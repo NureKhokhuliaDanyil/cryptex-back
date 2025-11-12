@@ -118,120 +118,122 @@ public class UserService : IUserService
     {
         try
         {
-            var result = await _unitOfWork.UserRepository
-                .GetSingleByConditionAsync(e => e.Id == id);
-
-            if (!result.IsSuccess)
-            {
-                throw new Exception($"Failed to get wallet");
-            }
-
-            var user = result.Data;
-            user.Wallet = await GetMyWallet(user.Id);
+            var user = await GetUserByIdAsync(id);
             var coinInWallet = user.Wallet.AmountOfCoins.FirstOrDefault(c => c.Name == coin);
 
             if (coinInWallet == null)
             {
-                throw new Exception($"Coin {coin} not found in user's wallet");
+                throw new EntityNotFoundException($"Coin {coin} not found in user's wallet");
             }
 
-            var moneyForThisOperation = coinInWallet.Price * amount;
-
-            if (moneyForThisOperation > user.Balance)
+            var currentPrice = coinInWallet.Price;
+            if (currentPrice <= 0)
             {
-                throw new Exception("Balance is less than required");
+                throw new InvalidOperationException($"Cannot buy {coin}, price is zero. Please update prices.");
             }
 
-            user.Balance += -moneyForThisOperation;
+            var cost = currentPrice * amount;
+
+            if (user.Balance == null || cost > user.Balance)
+            {
+                throw new InvalidOperationException("Insufficient balance.");
+            }
+
+            user.Balance -= cost;
             coinInWallet.Amount += amount;
-            await _walletService.UpdateCoin(coinInWallet);
+
+            var history = CreateHistoryEntry(id, TransactionType.Buy, -cost, coin, amount, currentPrice);
+            await _unitOfWork.TransactionHistoryRepository.AddAsync(history);
+
+            await _unitOfWork.CoinRepository.UpdateAsync(coinInWallet, c => c.Id == coinInWallet.Id);
             await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == id);
             await _unitOfWork.SaveChangesAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            throw new Exception($"failed to buy Coin {coin}. {e.Message}");
+            throw;
         }
     }
+
     public async Task SellCoin(int id, NameOfCoin coin, double amount)
     {
         try
         {
-            var result = await _unitOfWork.UserRepository
-                .GetSingleByConditionAsync(e => e.Id == id);
-
-            if (!result.IsSuccess)
-            {
-                throw new Exception($"Failed to get wallet");
-            }
-
-            var user = result.Data;
-            user.Wallet = await GetMyWallet(user.Id);
+            var user = await GetUserByIdAsync(id);
             var coinInWallet = user.Wallet.AmountOfCoins.FirstOrDefault(c => c.Name == coin);
 
             if (coinInWallet == null)
             {
-                throw new Exception($"Coin {coin} not found in user's wallet");
+                throw new EntityNotFoundException($"Coin {coin} not found in user's wallet");
             }
 
             if (coinInWallet.Amount < amount)
             {
-                throw new Exception($"Amount of coin in wallet is less than you want to sell");
-
+                throw new InvalidOperationException("Insufficient coin amount to sell.");
             }
-            var moneyIncomeAfterOperation = coinInWallet.Price * amount;
-            user.Balance += moneyIncomeAfterOperation;
+
+            var currentPrice = coinInWallet.Price;
+            var income = currentPrice * amount;
+
+            user.Balance = (user.Balance ?? 0) + income;
             coinInWallet.Amount -= amount;
-            await _walletService.UpdateCoin(coinInWallet);
+
+            var history = CreateHistoryEntry(id, TransactionType.Sell, income, coin, -amount, currentPrice);
+            await _unitOfWork.TransactionHistoryRepository.AddAsync(history);
+
+            await _unitOfWork.CoinRepository.UpdateAsync(coinInWallet, c => c.Id == coinInWallet.Id);
             await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == id);
             await _unitOfWork.SaveChangesAsync();
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            throw new Exception($"{e.Message}");
+            throw;
         }
     }
 
-    public async Task ConvertCurrency(
-        int idOfUser,
-        NameOfCoin CoinForConvert,
-        NameOfCoin imWhichCoinConvert,
-        double amountOfCoinForConvert
-        )
+    public async Task ConvertCurrency(int idOfUser, NameOfCoin coinForConvert, NameOfCoin imWhichCoinConvert, double amountOfCoinForConvert)
     {
         try
         {
-            var result = await _unitOfWork.UserRepository
-                .GetSingleByConditionAsync(e => e.Id == idOfUser);
-            if (!result.IsSuccess)
-            {
-                throw new Exception($"Failed to get wallet");
-            }
-            var user = result.Data;
-            var coinForConvert = user.Wallet.AmountOfCoins.FirstOrDefault(e => e.Name == CoinForConvert);
-            var coinToConvertInto = user.Wallet.AmountOfCoins.FirstOrDefault(e => e.Name == imWhichCoinConvert);
+            var user = await GetUserByIdAsync(idOfUser);
 
-            if (coinForConvert == null || coinToConvertInto == null)
+            var coinFrom = user.Wallet.AmountOfCoins.FirstOrDefault(e => e.Name == coinForConvert);
+            var coinTo = user.Wallet.AmountOfCoins.FirstOrDefault(e => e.Name == imWhichCoinConvert);
+
+            if (coinFrom == null || coinTo == null)
             {
-                throw new Exception("One of the coins was not found in the wallet.");
+                throw new EntityNotFoundException("One or both coins were not found in the wallet.");
             }
 
-            if (coinForConvert.Amount < amountOfCoinForConvert)
+            if (coinFrom.Amount < amountOfCoinForConvert)
             {
-                throw new Exception("Not enough coins for conversion.");
+                throw new InvalidOperationException("Not enough coins for conversion.");
             }
 
-            var amountAfterConversion = (coinForConvert.Price / coinToConvertInto.Price) * amountOfCoinForConvert;
-            coinForConvert.Amount -= amountOfCoinForConvert;
-            coinToConvertInto.Amount += amountAfterConversion;
-            await _walletService.UpdateCoin(coinForConvert);
-            await _walletService.UpdateCoin(coinToConvertInto);
-            await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == idOfUser);
+            if (coinTo.Price <= 0)
+            {
+                throw new InvalidOperationException($"Cannot convert to {coinTo.Name}, its price is zero.");
+            }
+
+            var amountAfterConversion = (coinFrom.Price / coinTo.Price) * amountOfCoinForConvert;
+            var usdValue = coinFrom.Price * amountOfCoinForConvert; 
+
+            coinFrom.Amount -= amountOfCoinForConvert;
+            coinTo.Amount += amountAfterConversion;
+
+            var historyFrom = CreateHistoryEntry(idOfUser, TransactionType.Convert, 0, coinFrom.Name, -amountOfCoinForConvert, coinFrom.Price, $"To {coinTo.Name}");
+            var historyTo = CreateHistoryEntry(idOfUser, TransactionType.Convert, 0, coinTo.Name, amountAfterConversion, coinTo.Price, $"From {coinFrom.Name}");
+
+            await _unitOfWork.TransactionHistoryRepository.AddAsync(historyFrom);
+            await _unitOfWork.TransactionHistoryRepository.AddAsync(historyTo);
+
+            await _unitOfWork.CoinRepository.UpdateAsync(coinFrom, c => c.Id == coinFrom.Id);
+            await _unitOfWork.CoinRepository.UpdateAsync(coinTo, c => c.Id == coinTo.Id);
             await _unitOfWork.SaveChangesAsync();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            throw new Exception($"Fail to convert coin: {ex.Message}");
+            throw;
         }
     }
 
