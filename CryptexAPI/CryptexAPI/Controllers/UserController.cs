@@ -121,4 +121,18 @@ public class UserController : ControllerBase
             return BadRequest(new { message = $"Error: {e.Message}" });
         }
     }
+
+    [HttpPost("{id}/withdraw")]
+    public async Task<IActionResult> WithdawFunds(int id, double amount)
+    {
+        try
+        {
+            await _userService.WithdrawFundsAsync(id, amount);
+            return Ok("Funds were withdrawed successfully");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+    }
 }
