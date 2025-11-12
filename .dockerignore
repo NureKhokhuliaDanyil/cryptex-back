@@ -1,0 +1,14 @@
+**/[Bb]in/
+**/[Oo]bj/
+
+.vs/
+*.user
+*.suo
+
+.git/
+.gitignore
+
+Dockerfile
+.dockerignore
+
+**/Properties/launchSettings.json
