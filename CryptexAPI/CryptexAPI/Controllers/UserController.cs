@@ -123,7 +123,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("{id}/withdraw")]
-    public async Task<IActionResult> WithdawFunds(int id, double amount)
+    public async Task<IActionResult> WithdawFunds(int id, [FromQuery] double amount)
     {
         try
         {
