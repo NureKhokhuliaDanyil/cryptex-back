@@ -1,0 +1,15 @@
+name: Update Coin Prices
+
+on:
+  schedule:
+    - cron: '*/1 * * * *'
+  workflow_dispatch:
+
+jobs:
+  update-prices:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call API to update prices
+        run: |
+          curl -X POST https://cryptex-back.onrender.com/api/jobs/update-prices \
+          -H "x-api-key: ${{ secrets.CRON_SECRET_KEY }}"
