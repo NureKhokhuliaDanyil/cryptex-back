@@ -1,4 +1,5 @@
-﻿using CryptexAPI.Models.Persons;
+﻿using CryptexAPI.Models;
+using CryptexAPI.Models.Persons;
 using CryptexAPI.Models.Wallets;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,4 +12,5 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     public DbSet<User> Users { get; set; }
     public DbSet<Wallet> Wallets { get; set; }
     public DbSet<WalletForMarket> WalletForMarkets { get; set; }
+    public DbSet<FuethersDeal> FuethersDeals { get; set; }
 }
