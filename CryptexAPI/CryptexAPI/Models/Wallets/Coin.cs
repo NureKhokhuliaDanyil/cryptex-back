@@ -9,4 +9,5 @@ public class Coin : BaseEntity
     public double Price { get; set; }
     public double Amount { get; set; } = 0;
     public int WalletId { get; set; }
+    public string? DepositAddress { get; set; }
 }

@@ -136,6 +136,23 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPatch("{userId}/deposit-crypto")]
+    public async Task<IActionResult> DepositCrypto(
+        int userId,
+        [FromQuery] string depositAddress,
+        [FromQuery] double amount)
+    {
+        try
+        {
+            var user = await _userService.DepositCryptoAsync(userId, depositAddress, amount);
+            return Ok(user);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = $"Error depositing crypto: {e.Message}" });
+        }
+    }
+
     [HttpPost("{id}/withdraw")]
     public async Task<IActionResult> WithdrawFunds(int id, [FromQuery] double amount)
     {
