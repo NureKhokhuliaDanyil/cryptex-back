@@ -1,4 +1,5 @@
-﻿using CryptexAPI.Models;
+﻿using CryptexAPI.Enums;
+using CryptexAPI.Models;
 using CryptexAPI.Models.Persons;
 using CryptexAPI.Models.Wallets;
 
@@ -13,4 +14,5 @@ public interface IUserService : ISpotOperations, IAuth
     Task WithdrawFundsAsync(int userId, double amount);
     Task<List<TransactionHistory>> GetTransactionHistoryAsync(int userId);
     Task<User> DepositCryptoAsync(int userId, string depositAddress, double amount);
+    Task WithdrawCryptoAsync(int userId, NameOfCoin coinName, double amount, string externalAddress);
 }
