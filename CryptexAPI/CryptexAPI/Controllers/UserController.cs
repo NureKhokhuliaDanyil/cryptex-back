@@ -167,6 +167,24 @@ public class UserController : ControllerBase
         }
     }
 
+    [HttpPost("{id}/withdraw-crypto")]
+    public async Task<IActionResult> WithdrawCrypto(
+        int id,
+        [FromQuery] NameOfCoin coinName,
+        [FromQuery] double amount,
+        [FromQuery] string externalAddress)
+    {
+        try
+        {
+            await _userService.WithdrawCryptoAsync(id, coinName, amount, externalAddress);
+            return Ok($"Withdrawal of {amount} {coinName} to {externalAddress} initiated successfully.");
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = $"Error withdrawing crypto: {ex.Message}" });
+        }
+    }
+
     [HttpGet("{id}/history")]
     public async Task<IActionResult> GetTransactionHistory(int id)
     {

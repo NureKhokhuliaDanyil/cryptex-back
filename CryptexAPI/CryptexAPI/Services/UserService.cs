@@ -358,6 +358,47 @@ public class UserService : IUserService
         return user;
     }
 
+    public async Task WithdrawCryptoAsync(int userId, NameOfCoin coinName, double amount, string externalAddress)
+    {
+        if (amount <= 0)
+        {
+            throw new ArgumentException($"Withdrawal amount for {coinName} must be positive.");
+        }
+
+        var user = await GetUserByIdAsync(userId);
+        var coinInWallet = user.Wallet.AmountOfCoins.FirstOrDefault(c => c.Name == coinName);
+
+        if (coinInWallet == null)
+        {
+            throw new EntityNotFoundException($"Coin {coinName} not found in user's wallet.");
+        }
+
+        if (coinInWallet.Amount < amount)
+        {
+            throw new InvalidOperationException($"Insufficient {coinName} amount to withdraw.");
+        }
+
+        coinInWallet.Amount -= amount;
+
+        var usdValueChange = coinInWallet.Price * amount;
+        var notes = $"To external address: {externalAddress}";
+
+        var history = CreateHistoryEntry(
+            userId,
+            TransactionType.Withdraw,
+            -usdValueChange,
+            coinName,
+            -amount,
+            coinInWallet.Price,
+            notes);
+
+        await _unitOfWork.TransactionHistoryRepository.AddAsync(history);
+
+        await _unitOfWork.CoinRepository.UpdateAsync(coinInWallet, c => c.Id == coinInWallet.Id);
+        await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == userId);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     #endregion
 
     #region Private Helpers
