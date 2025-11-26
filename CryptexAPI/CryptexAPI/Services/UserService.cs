@@ -322,6 +322,42 @@ public class UserService : IUserService
         }
     }
 
+    public async Task<User> DepositCryptoAsync(int userId, string depositAddress, double amount)
+    {
+        if (amount <= 0)
+        {
+            throw new ArgumentException($"Deposit amount must be positive.");
+        }
+
+        var user = await GetUserByIdAsync(userId);
+        var coinInWallet = user.Wallet.AmountOfCoins.FirstOrDefault(c => c.DepositAddress == depositAddress);
+
+        if (coinInWallet == null)
+        {
+            throw new EntityNotFoundException($"Deposit address {depositAddress} not found in user's wallet.");
+        }
+
+        coinInWallet.Amount += amount;
+        var usdValueChange = coinInWallet.Price * amount;
+
+        var history = CreateHistoryEntry(
+            userId,
+            TransactionType.Deposit,
+            usdValueChange,
+            coinInWallet.Name,
+            amount,
+            coinInWallet.Price,
+            $"Crypto deposit of {amount} {coinInWallet.Name}");
+
+        await _unitOfWork.TransactionHistoryRepository.AddAsync(history);
+
+        await _unitOfWork.CoinRepository.UpdateAsync(coinInWallet, c => c.Id == coinInWallet.Id);
+        await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == userId);
+        await _unitOfWork.SaveChangesAsync();
+
+        return user;
+    }
+
     #endregion
 
     #region Private Helpers

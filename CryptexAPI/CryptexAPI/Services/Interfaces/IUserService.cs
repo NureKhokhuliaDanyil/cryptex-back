@@ -12,4 +12,5 @@ public interface IUserService : ISpotOperations, IAuth
     Task<User> DepositFundsAsync(int userId, double amount);
     Task WithdrawFundsAsync(int userId, double amount);
     Task<List<TransactionHistory>> GetTransactionHistoryAsync(int userId);
+    Task<User> DepositCryptoAsync(int userId, string depositAddress, double amount);
 }

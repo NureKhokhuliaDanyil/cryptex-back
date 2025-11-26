@@ -1,4 +1,5 @@
 ﻿using CryptexAPI.Enums;
+using CryptexAPI.Helpers;
 using CryptexAPI.Helpers.Constants;
 using CryptexAPI.Models.Wallets;
 using CryptexAPI.Services.Interfaces;
@@ -41,7 +42,8 @@ public class WalletService : IWalletService
                 Amount = 0,
                 Name = name,
                 Price = 0,
-                WalletId = walletId
+                WalletId = walletId,
+                DepositAddress = AddressGenerator.GenerateCryptoAddress(name)
             };
             coinList.Add(coin);
         }
