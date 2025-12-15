@@ -1,6 +1,7 @@
 ﻿using CryptexAPI.Enums;
 using CryptexAPI.Exceptions;
 using CryptexAPI.Helpers;
+using CryptexAPI.Helpers.Constants;
 using CryptexAPI.Models;
 using CryptexAPI.Models.Identity;
 using CryptexAPI.Models.Persons;
@@ -16,10 +17,16 @@ public class UserService : IUserService
 
     private readonly IUnitOfWork _unitOfWork;
 
-    public UserService(IWalletService walletService, IUnitOfWork unitOfWork)
+    private readonly ITicketService _ticketService;
+
+    private readonly IEmailService _emailService;
+
+    public UserService(IWalletService walletService, IUnitOfWork unitOfWork, ITicketService ticketService, IEmailService emailService)
     {
         _walletService = walletService;
         _unitOfWork = unitOfWork;
+        _ticketService = ticketService;
+        _emailService = emailService;
     }
 
     #region IAuth Implementation
@@ -96,6 +103,9 @@ public class UserService : IUserService
 
             if (user != null && PasswordHasher.VerifyPassword(loginModel.Password, user.PasswordHash, user.PasswordSalt))
             {
+                await _emailService.SendEmail(user.Email, EmailStrings.WelcomeSubject,
+                    EmailStrings.GetWelcomeBody(user.Name, user.Surname));
+
                 return user;
             }
         }
@@ -148,6 +158,16 @@ public class UserService : IUserService
             await _unitOfWork.CoinRepository.UpdateAsync(coinInWallet, c => c.Id == coinInWallet.Id);
             await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == id);
             await _unitOfWork.SaveChangesAsync();
+
+
+            await _emailService.SendEmail(user.Email, EmailStrings.BuyCoinSubject,
+                EmailStrings.GetBuyCoinBody(
+                    user.Name,
+                    user.Surname,
+                    coin, amount,
+                    user.Balance
+                )
+            );
         }
         catch (Exception)
         {
@@ -184,6 +204,15 @@ public class UserService : IUserService
             await _unitOfWork.CoinRepository.UpdateAsync(coinInWallet, c => c.Id == coinInWallet.Id);
             await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == id);
             await _unitOfWork.SaveChangesAsync();
+
+            await _emailService.SendEmail(user.Email, EmailStrings.SellCoinSubject,
+                EmailStrings.GetSellCoinBody(
+                    user.Name,
+                    user.Surname,
+                    coin, amount,
+                    user.Balance
+                )
+            );
         }
         catch (Exception)
         {
@@ -230,6 +259,10 @@ public class UserService : IUserService
             await _unitOfWork.CoinRepository.UpdateAsync(coinFrom, c => c.Id == coinFrom.Id);
             await _unitOfWork.CoinRepository.UpdateAsync(coinTo, c => c.Id == coinTo.Id);
             await _unitOfWork.SaveChangesAsync();
+
+            await _emailService.SendEmail(user.Email, EmailStrings.ConvertCurrencySubject,
+                EmailStrings.GetConvertCurrencyBody(user.Name, user.Surname, coinForConvert,
+                    coinFrom.Amount, imWhichCoinConvert, coinTo.Amount));
         }
         catch (Exception)
         {
@@ -243,6 +276,7 @@ public class UserService : IUserService
     public async Task<double> GetTotalWalletBalance(int id)
     {
         var user = await GetUserByIdAsync(id);
+
         return user.Wallet.AmountOfCoins.Sum(coin => coin.Amount * coin.Price);
     }
 
@@ -440,6 +474,83 @@ public class UserService : IUserService
             UsdValueChange = usdValueChange,
             Notes = notes
         };
+    }
+
+    #endregion
+
+    #region Ticket Features
+
+    public async Task<Ticket> CreateTicket(int id)
+    {
+        try
+        {
+            var ticket = await _ticketService.CreateTicket(id);
+            var user = await _unitOfWork.UserRepository
+                .GetSingleByConditionAsync(e => e.Id == id);
+
+            await _emailService.SendEmail(user.Data.Email, EmailStrings.WelcomeSubject,
+                EmailStrings.GetTicketCreatedBody(user.Data.Name, user.Data.Surname, ticket.Id, ticket.Status));
+
+            return ticket;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
+    }
+
+    public async Task SendMessageToTicketChat(int idOfTicket, int idOfAuthorOfMessage, string valueOfMessage)
+    {
+        try
+        {
+            if (idOfAuthorOfMessage == null)
+            {
+                throw new Exception("Empty author of ticket");
+            }
+            await _ticketService.SendMessageToTicket(idOfTicket, idOfAuthorOfMessage, valueOfMessage);
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Failed to get user {e.Message}");
+        }
+    }
+
+    public async Task<List<Ticket>> GetAllMyTickets(int userId)
+    {
+        try
+        {
+            var tickets = await _unitOfWork.TicketRepository.GetListByConditionAsync(e => e.UserId == userId);
+            var updatedTicketsWithChatHistory = tickets.Data.ToList();
+            if (tickets == null)
+            {
+                throw new Exception("Failed to get tickets");
+            }
+
+            return updatedTicketsWithChatHistory;
+        }
+        catch (Exception e)
+        {
+            throw new Exception($"Error {e.Message}");
+        }
+    }
+
+    public async Task<Ticket> GetTicketById(int idOfTicket)
+    {
+        try
+        {
+            var ticket = await _ticketService.GetTicketById(idOfTicket);
+            if (ticket == null)
+            {
+                throw new Exception("Failed to get ticket");
+            }
+
+            return ticket;
+        }
+        catch (Exception e)
+        {
+            throw new Exception("Failed to get ticket");
+        }
     }
 
     #endregion
