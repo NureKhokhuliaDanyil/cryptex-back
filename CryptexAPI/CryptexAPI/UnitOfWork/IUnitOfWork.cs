@@ -11,5 +11,8 @@ public interface IUnitOfWork
     IWalletRepository WalletRepository { get; }
     IFuethersDealRepository FuethersDealRepository { get; }
     ITransactionHistoryRepository TransactionHistoryRepository { get; }
+    IMessageRepository MessageRepository { get; }
+    ISupportRepository SupportRepository { get; }
+    ITicketRepository TicketRepository { get; }
     Task SaveChangesAsync();
 }
