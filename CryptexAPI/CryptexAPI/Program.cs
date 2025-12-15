@@ -94,9 +94,10 @@ namespace CryptexAPI
                 options.AddPolicy(name: myAllowSpecificOrigins,
                                   policy =>
                                   {
-                                      policy.AllowAnyOrigin()
+                                      policy.SetIsOriginAllowed(origin => true)
                                             .AllowAnyHeader()
-                                            .AllowAnyMethod();
+                                            .AllowAnyMethod()
+                                            .AllowCredentials();
                                   });
             });
 
