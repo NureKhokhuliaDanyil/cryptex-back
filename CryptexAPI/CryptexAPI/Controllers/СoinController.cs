@@ -1,4 +1,5 @@
 ﻿using CryptexAPI.Enums;
+using CryptexAPI.Models.Wallets;
 using CryptexAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +19,7 @@ public class СoinController : ControllerBase
     }
 
     [HttpGet("price-history")]
-    public async Task<ActionResult<List<double>>> GetPriceHistory(
+    public async Task<ActionResult<List<PriceHistoryItem>>> GetPriceHistory(
         [FromQuery] NameOfCoin coin,
         [FromQuery] BinanceInterval periodOfTime)
     {

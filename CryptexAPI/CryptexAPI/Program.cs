@@ -86,6 +86,10 @@ namespace CryptexAPI
             builder.Services.AddScoped<IMessageService, MessageService>();
             builder.Services.AddScoped<ISupportService, SupportService>();
             builder.Services.AddScoped<ITicketService, TicketService>();
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings"));
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 

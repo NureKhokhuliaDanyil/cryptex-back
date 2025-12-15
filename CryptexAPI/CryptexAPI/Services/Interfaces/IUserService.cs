@@ -15,4 +15,8 @@ public interface IUserService : ISpotOperations, IAuth
     Task<List<TransactionHistory>> GetTransactionHistoryAsync(int userId);
     Task<User> DepositCryptoAsync(int userId, string depositAddress, double amount);
     Task WithdrawCryptoAsync(int userId, NameOfCoin coinName, double amount, string externalAddress);
+    Task<Ticket> CreateTicket(int userId);
+    Task<Ticket> GetTicketById(int idOfTicket);
+    Task SendMessageToTicketChat(int idOfTicket, int idOfAuthorOfMessage, string valueOfMessage);
+    Task<List<Ticket>> GetAllMyTickets(int userId);
 }
