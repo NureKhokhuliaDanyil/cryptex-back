@@ -50,30 +50,38 @@ public class UserService : IUserService
         RegistrationModel registrationModel,
         Wallet wallet,
         bool IsGoogleRegistration = false
-        )
+    )
     {
-        if (registrationModel != null)  
+        if (registrationModel != null)
         {
             var parsedRole = Enum.Parse<Role>(registrationModel.Role);
-            var baseUser = new User()
-            {
-                GoogleID = registrationModel.GoogleID,
-                Email = registrationModel.Email,
-                Name = registrationModel.Name,
-                Surname = registrationModel.Surname,
-                PhoneNumber = registrationModel.PhoneNumber,
-                Wallet = wallet,
-                WalletId = wallet.Id,
-                Age = registrationModel.Age,
-                Country = registrationModel.Country,
-                Adress = registrationModel.Adress,
-                Role = parsedRole
-            };
 
-            var userEntity = parsedRole switch
+            User userEntity;
+
+            if (parsedRole == Role.Support)
             {
-                _ => baseUser
-            };
+                userEntity = new Support
+                {
+                    Experience = 0,
+                    Salary = 200
+                };
+            }
+            else
+            {
+                userEntity = new User();
+            }
+
+            userEntity.GoogleID = registrationModel.GoogleID;
+            userEntity.Email = registrationModel.Email;
+            userEntity.Name = registrationModel.Name;
+            userEntity.Surname = registrationModel.Surname;
+            userEntity.PhoneNumber = registrationModel.PhoneNumber;
+            userEntity.Wallet = wallet;
+            userEntity.WalletId = wallet.Id;
+            userEntity.Age = registrationModel.Age;
+            userEntity.Country = registrationModel.Country;
+            userEntity.Adress = registrationModel.Adress;
+            userEntity.Role = parsedRole;
 
             if (!IsGoogleRegistration)
             {
