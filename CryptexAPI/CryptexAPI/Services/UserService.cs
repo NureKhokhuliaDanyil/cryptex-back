@@ -101,13 +101,13 @@ public class UserService : IUserService
                 .GetSingleByConditionAsync(x => x.Email == loginModel.Email);
             var user = result.Data;
 
-            if (user != null && PasswordHasher.VerifyPassword(loginModel.Password, user.PasswordHash, user.PasswordSalt))
-            {
-                await _emailService.SendEmail(user.Email, EmailStrings.WelcomeSubject,
-                    EmailStrings.GetWelcomeBody(user.Name, user.Surname));
+            //if (user != null && PasswordHasher.VerifyPassword(loginModel.Password, user.PasswordHash, user.PasswordSalt))
+            //{
+            //    await _emailService.SendEmail(user.Email, EmailStrings.WelcomeSubject,
+            //        EmailStrings.GetWelcomeBody(user.Name, user.Surname));
 
-                return user;
-            }
+            //    return user;
+            //}
         }
 
         return null;
@@ -160,14 +160,14 @@ public class UserService : IUserService
             await _unitOfWork.SaveChangesAsync();
 
 
-            await _emailService.SendEmail(user.Email, EmailStrings.BuyCoinSubject,
-                EmailStrings.GetBuyCoinBody(
-                    user.Name,
-                    user.Surname,
-                    coin, amount,
-                    user.Balance
-                )
-            );
+            //await _emailService.SendEmail(user.Email, EmailStrings.BuyCoinSubject,
+            //    EmailStrings.GetBuyCoinBody(
+            //        user.Name,
+            //        user.Surname,
+            //        coin, amount,
+            //        user.Balance
+            //    )
+            //);
         }
         catch (Exception)
         {
@@ -205,14 +205,14 @@ public class UserService : IUserService
             await _unitOfWork.UserRepository.UpdateAsync(user, e => e.Id == id);
             await _unitOfWork.SaveChangesAsync();
 
-            await _emailService.SendEmail(user.Email, EmailStrings.SellCoinSubject,
-                EmailStrings.GetSellCoinBody(
-                    user.Name,
-                    user.Surname,
-                    coin, amount,
-                    user.Balance
-                )
-            );
+            //await _emailService.SendEmail(user.Email, EmailStrings.SellCoinSubject,
+            //    EmailStrings.GetSellCoinBody(
+            //        user.Name,
+            //        user.Surname,
+            //        coin, amount,
+            //        user.Balance
+            //    )
+            //);
         }
         catch (Exception)
         {
@@ -260,9 +260,9 @@ public class UserService : IUserService
             await _unitOfWork.CoinRepository.UpdateAsync(coinTo, c => c.Id == coinTo.Id);
             await _unitOfWork.SaveChangesAsync();
 
-            await _emailService.SendEmail(user.Email, EmailStrings.ConvertCurrencySubject,
-                EmailStrings.GetConvertCurrencyBody(user.Name, user.Surname, coinForConvert,
-                    coinFrom.Amount, imWhichCoinConvert, coinTo.Amount));
+            //await _emailService.SendEmail(user.Email, EmailStrings.ConvertCurrencySubject,
+            //    EmailStrings.GetConvertCurrencyBody(user.Name, user.Surname, coinForConvert,
+            //        coinFrom.Amount, imWhichCoinConvert, coinTo.Amount));
         }
         catch (Exception)
         {
@@ -488,8 +488,8 @@ public class UserService : IUserService
             var user = await _unitOfWork.UserRepository
                 .GetSingleByConditionAsync(e => e.Id == id);
 
-            await _emailService.SendEmail(user.Data.Email, EmailStrings.WelcomeSubject,
-                EmailStrings.GetTicketCreatedBody(user.Data.Name, user.Data.Surname, ticket.Id, ticket.Status));
+            //await _emailService.SendEmail(user.Data.Email, EmailStrings.WelcomeSubject,
+            //    EmailStrings.GetTicketCreatedBody(user.Data.Name, user.Data.Surname, ticket.Id, ticket.Status));
 
             return ticket;
         }
