@@ -60,7 +60,7 @@ namespace CryptexAPI
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-            var connectionString = "Host=dpg-d48rs4mmcj7s73e53fng-a;Port=5432;Database=cryptex;Username=cryptex_user;Password=6XwTTpNo3eEd9HAvHUL7zPV3G466hRB6";
+            var connectionString = "Host=dpg-d5049j9r0fns73a1832g-a;Port=5432;Database=cryptex_3o95;Username=cryptex_user;Password=9OB2mhkhVy52FQSGVPms4qRlCfjGuUGY";
 
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(connectionString));
