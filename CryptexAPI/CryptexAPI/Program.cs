@@ -80,6 +80,12 @@ namespace CryptexAPI
             builder.Services.AddScoped<IFuethersDealService, FuethersDealService>();
             builder.Services.AddScoped<IFuethersDealRepository, FuethersDealRepository>();
             builder.Services.AddScoped<ITransactionHistoryRepository, TransactionHistoryRepository>();
+            builder.Services.AddScoped<IMessageRepository, MessageRepository>();
+            builder.Services.AddScoped<ISupportRepository, SupportRepository>();
+            builder.Services.AddScoped<ITicketRepository, TicketRepository>();
+            builder.Services.AddScoped<IMessageService, MessageService>();
+            builder.Services.AddScoped<ISupportService, SupportService>();
+            builder.Services.AddScoped<ITicketService, TicketService>();
 
             var myAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
