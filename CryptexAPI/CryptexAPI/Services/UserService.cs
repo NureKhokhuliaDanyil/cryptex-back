@@ -101,13 +101,10 @@ public class UserService : IUserService
                 .GetSingleByConditionAsync(x => x.Email == loginModel.Email);
             var user = result.Data;
 
-            //if (user != null && PasswordHasher.VerifyPassword(loginModel.Password, user.PasswordHash, user.PasswordSalt))
-            //{
-            //    await _emailService.SendEmail(user.Email, EmailStrings.WelcomeSubject,
-            //        EmailStrings.GetWelcomeBody(user.Name, user.Surname));
-
-            //    return user;
-            //}
+            if (user != null && PasswordHasher.VerifyPassword(loginModel.Password, user.PasswordHash, user.PasswordSalt))
+            {
+                return user;
+            }
         }
 
         return null;
