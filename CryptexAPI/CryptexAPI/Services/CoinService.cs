@@ -32,7 +32,7 @@ public class CoinService : ICoinService
         }
     }
 
-    public async Task<List<double>> GetPriceHistory(NameOfCoin coin, BinanceInterval interval)
+    public async Task<List<PriceHistoryItem>> GetPriceHistory(NameOfCoin coin, BinanceInterval interval)
     {
         try
         {
@@ -51,8 +51,18 @@ public class CoinService : ICoinService
             {
                 throw new Exception("Failed to deserialize or empty Binance response");
             }
-                
-            return data.Select(item => double.Parse(item[4].ToString(), CultureInfo.InvariantCulture)).ToList();
+
+            return data.Select(item =>
+            {
+                long timestamp = long.Parse(item[0].ToString());
+                double price = double.Parse(item[4].ToString(), CultureInfo.InvariantCulture);
+
+                return new PriceHistoryItem
+                {
+                    Date = DateTimeOffset.FromUnixTimeMilliseconds(timestamp).UtcDateTime,
+                    Price = price
+                };
+            }).ToList();
         }
         catch (Exception e)
         {

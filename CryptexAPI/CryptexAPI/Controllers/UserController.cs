@@ -198,4 +198,51 @@ public class UserController : ControllerBase
             return BadRequest(new { message = ex.Message });
         }
     }
+
+    [HttpPost("{id}/tickets")]
+    public async Task<IActionResult> CreateTicket(int id)
+    {
+        try
+        {
+            var ticket = await _userService.CreateTicket(id);
+            return Ok(ticket);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = e.Message });
+        }
+    }
+
+    [HttpPost("tickets/{ticketId}/messages")]
+    public async Task<IActionResult> SendMessageToTicketChat(int ticketId, [FromQuery] int authorId, [FromBody] string message)
+    {
+        try
+        {
+            if (authorId == 0)
+            {
+                return BadRequest(new { message = "Empty author of ticket" });
+            }
+
+            await _userService.SendMessageToTicketChat(ticketId, authorId, message);
+            return Ok(new { message = "Message sent" });
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = $"Failed to send message: {e.Message}" });
+        }
+    }
+
+    [HttpGet("{userId}/tickets")]
+    public async Task<IActionResult> GetAllMyTickets(int userId)
+    {
+        try
+        {
+            var tickets = await _userService.GetAllMyTickets(userId);
+            return Ok(tickets);
+        }
+        catch (Exception e)
+        {
+            return BadRequest(new { message = $"Error: {e.Message}" });
+        }
+    }
 }
